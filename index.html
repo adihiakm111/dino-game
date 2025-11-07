@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dino Run 🦖</title>
   <style>
+    /* Basic reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* Default background (day mode) */
     body {
       background: linear-gradient(to top, #c8e6c9 40%, #bbdefb 60%);
       display: flex;
@@ -22,10 +24,12 @@
       transition: background 1s;
     }
 
+    /* After score 50 → night mode */
     body.night {
       background: linear-gradient(to top, #0d1b2a 40%, #1b263b 60%);
     }
 
+    /* Game canvas */
     canvas {
       display: none;
       background: linear-gradient(to top, #a5d6a7 40%, #b3e5fc 60%);
@@ -36,13 +40,13 @@
       transition: background 1s;
     }
 
+    /* Canvas night mode */
     canvas.night {
       background: linear-gradient(to top, #222831 40%, #393e46 60%);
     }
 
-    #menu, #restartMenu {
-      text-align: center;
-    }
+    /* Center text menus */
+    #menu, #restartMenu { text-align: center; }
 
     h1 {
       color: #222;
@@ -50,6 +54,7 @@
       margin-bottom: 20px;
     }
 
+    /* Buttons */
     button {
       padding: 10px 25px;
       margin: 10px;
@@ -62,20 +67,19 @@
       transition: 0.3s;
     }
 
-    button:hover {
-      background-color: #388e3c;
-    }
+    button:hover { background-color: #388e3c; }
 
-    #restartMenu {
-      display: none;
-    }
+    /* Restart hidden by default */
+    #restartMenu { display: none; }
 
+    /* Score text on restart menu */
     #finalScore {
       font-size: 1.5em;
       margin: 10px 0;
       color: #333;
     }
 
+    /* Hard mode text */
     #hardModeText {
       position: absolute;
       top: 20%;
@@ -106,15 +110,27 @@
   </div>
 
   <script>
+    // -----------------------------
+    // CANVAS & MAIN ELEMENTS
+    // -----------------------------
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
+
     const startBtn = document.getElementById("startBtn");
     const restartBtn = document.getElementById("restartBtn");
+
     const menu = document.getElementById("menu");
     const restartMenu = document.getElementById("restartMenu");
+
     const finalScore = document.getElementById("finalScore");
     const hardModeText = document.getElementById("hardModeText");
 
+    // ✅ TOP SCORE SYSTEM
+    let topScore = localStorage.getItem("topScore")
+      ? parseInt(localStorage.getItem("topScore"))
+      : 0;
+
+    // Canvas responsive size
     function resizeCanvas() {
       canvas.width = window.innerWidth * 0.9;
       canvas.height = window.innerHeight * 0.6;
@@ -124,12 +140,17 @@
 
     const dinoImg = new Image();
     dinoImg.src = "dino.png";
+
     const cactusImg = new Image();
     cactusImg.src = "cactus.png";
 
     let dino, ground, cactus, score, gameOver, speedIncrease, gameStarted, hardModeOn;
 
+    // -----------------------------
+    // START / RESTART GAME
+    // -----------------------------
     function initGame() {
+
       document.body.classList.remove("night");
       canvas.classList.remove("night");
       hardModeText.style.display = "none";
@@ -145,18 +166,34 @@
         grounded: false,
         crouching: false,
       };
-      ground = { y: canvas.height - 100, height: 100 };
-      cactus = { x: canvas.width, y: ground.y - 45, width: 45, height: 45, speed: 6 };
+
+      ground = { 
+        y: canvas.height - 100,
+        height: 100
+      };
+
+      cactus = { 
+        x: canvas.width,
+        y: ground.y - 45,
+        width: 45,
+        height: 45,
+        speed: 6
+      };
+
       score = 0;
       gameOver = false;
       speedIncrease = 0.002;
       gameStarted = true;
       hardModeOn = false;
+
       canvas.style.display = "block";
       menu.style.display = "none";
       restartMenu.style.display = "none";
     }
 
+    // -----------------------------
+    // CONTROLS
+    // -----------------------------
     function jump() {
       if (dino.grounded && !dino.crouching) {
         dino.vy = dino.jumpPower;
@@ -177,17 +214,21 @@
       }
     }
 
+    // -----------------------------
+    // UPDATE GAME PHYSICS
+    // -----------------------------
     function update() {
       if (!gameStarted || gameOver) return;
 
-      // Speed control based on score
       if (score >= 5 && score < 10) cactus.speed = 10;
+
       if (score >= 10 && score < 50) {
         cactus.speed = 13;
         dino.gravity = 1.6;
         dino.jumpPower = -18;
         activateHardMode();
       }
+
       if (score >= 50) {
         document.body.classList.add("night");
         canvas.classList.add("night");
@@ -205,19 +246,20 @@
       }
 
       cactus.x -= cactus.speed;
+
       if (cactus.x + cactus.width < 0) {
         cactus.x = canvas.width + Math.random() * 200;
         score++;
         cactus.speed += 0.15;
       }
 
-      // Collision
       const dinoBox = {
         left: dino.x + 10,
         right: dino.x + dino.width - 15,
         top: dino.y + 5,
         bottom: dino.y + dino.height - 5,
       };
+
       const cactusBox = {
         left: cactus.x + 5,
         right: cactus.x + cactus.width - 5,
@@ -236,19 +278,28 @@
       }
     }
 
+    // -----------------------------
+    // DRAW EVERYTHING
+    // -----------------------------
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       ctx.fillStyle = "#6d4c41";
       ctx.fillRect(0, ground.y, canvas.width, ground.height);
 
       if (cactusImg.complete)
         ctx.drawImage(cactusImg, cactus.x, cactus.y, cactus.width, cactus.height);
+
       if (dinoImg.complete)
         ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
 
       ctx.fillStyle = "#222";
       ctx.font = "22px Arial";
+
       ctx.fillText("Score: " + score, 20, 30);
+
+      // ✅ SHOW TOP SCORE
+      ctx.fillText("Top: " + topScore, 20, 60);
     }
 
     function gameLoop() {
@@ -257,12 +308,24 @@
       if (!gameOver) requestAnimationFrame(gameLoop);
     }
 
+    // -----------------------------
+    // RESTART SCREEN
+    // -----------------------------
     function showRestart() {
       canvas.style.display = "none";
       restartMenu.style.display = "block";
       finalScore.textContent = "Your Score: " + score;
+
+      // ✅ UPDATE TOP SCORE
+      if (score > topScore) {
+        topScore = score;
+        localStorage.setItem("topScore", topScore);
+      }
     }
 
+    // -----------------------------
+    // EVENTS
+    // -----------------------------
     startBtn.addEventListener("click", () => {
       initGame();
       gameLoop();
@@ -285,18 +348,21 @@
         setTimeout(() => crouch(false), 400);
       }
     });
+
     window.addEventListener("contextmenu", e => e.preventDefault());
 
     let lastTap = 0;
     canvas.addEventListener("touchstart", e => {
       const currentTime = new Date().getTime();
       const tapGap = currentTime - lastTap;
+
       if (tapGap < 300 && tapGap > 0) {
         crouch(true);
         setTimeout(() => crouch(false), 400);
       } else {
         jump();
       }
+
       lastTap = currentTime;
     });
   </script>
