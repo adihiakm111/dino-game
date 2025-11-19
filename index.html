@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dino Run 🦖</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: linear-gradient(to top, #c8e6c9 40%, #bbdefb 60%);
@@ -62,13 +58,9 @@
       transition: 0.3s;
     }
 
-    button:hover {
-      background-color: #388e3c;
-    }
+    button:hover { background-color: #388e3c; }
 
-    #restartMenu {
-      display: none;
-    }
+    #restartMenu { display: none; }
 
     #finalScore {
       font-size: 1.5em;
@@ -108,7 +100,7 @@
 
   <div id="hardModeText">Hard Mode Activated!</div>
 
-  <!-- PASSWORD SCRIPT -->
+  <!-- ONE TIME PASSWORD SCRIPT -->
   <script>
     function checkPassword() {
       let pass = prompt("Password daalo:");
@@ -122,8 +114,13 @@
       }
     }
 
-    if (!checkPassword()) {
-      location.reload();
+    // Agar pehle se verified nahi hai to password pucho
+    if (!localStorage.getItem("verifiedUser")) {
+      if (!checkPassword()) {
+        location.reload();
+      } else {
+        localStorage.setItem("verifiedUser", "yes");
+      }
     }
   </script>
 
