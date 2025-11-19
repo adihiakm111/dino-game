@@ -89,7 +89,9 @@
     }
   </style>
 </head>
+
 <body>
+
   <div id="menu">
     <h1>Dino Run 🦖</h1>
     <button id="startBtn">Start Game</button>
@@ -97,7 +99,6 @@
   </div>
 
   <canvas id="gameCanvas"></canvas>
-  <div id="hardModeText">⚡ Hard Mode Activated!</div>
 
   <div id="restartMenu">
     <h2>Game Over</h2>
@@ -105,6 +106,28 @@
     <button id="restartBtn">Restart</button>
   </div>
 
+  <div id="hardModeText">Hard Mode Activated!</div>
+
+  <!-- PASSWORD SCRIPT -->
+  <script>
+    function checkPassword() {
+      let pass = prompt("Password daalo:");
+
+      if (pass === "Aditya") {
+        alert("Welcome!");
+        return true;
+      } else {
+        alert("Galat password!");
+        return false;
+      }
+    }
+
+    if (!checkPassword()) {
+      location.reload();
+    }
+  </script>
+
+  <!-- GAME SCRIPT -->
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
@@ -118,12 +141,10 @@
     const finalScore = document.getElementById("finalScore");
     const hardModeText = document.getElementById("hardModeText");
 
-    // ✅ TOP SCORE
     let topScore = localStorage.getItem("topScore")
       ? parseInt(localStorage.getItem("topScore"))
       : 0;
 
-    // ✅ DEATH SOUND
     const deathSound = new Audio("No SMS Sound_1762407927349.mp3");
 
     function resizeCanvas() {
@@ -246,7 +267,7 @@
         dinoBox.top < cactusBox.bottom &&
         dinoBox.bottom > cactusBox.top
       ) {
-        deathSound.play();   // ✅ PLAY SOUND
+        deathSound.play();
         gameOver = true;
         setTimeout(() => showRestart(), 600);
       }
@@ -266,8 +287,6 @@
       ctx.fillStyle = "#222";
       ctx.font = "22px Arial";
       ctx.fillText("Score: " + score, 20, 30);
-
-      // ✅ SHOW TOP SCORE
       ctx.fillText("Top: " + topScore, 20, 60);
     }
 
@@ -282,7 +301,6 @@
       restartMenu.style.display = "block";
       finalScore.textContent = "Your Score: " + score;
 
-      // ✅ UPDATE TOP SCORE
       if (score > topScore) {
         topScore = score;
         localStorage.setItem("topScore", topScore);
@@ -329,5 +347,6 @@
       lastTap = currentTime;
     });
   </script>
+
 </body>
 </html>
